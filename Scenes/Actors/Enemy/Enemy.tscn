@@ -1,0 +1,217 @@
+[gd_scene load_steps=31 format=3 uid="uid://1ccei5u8k8qe"]
+
+[ext_resource type="Texture2D" uid="uid://dbtwrwugaasof" path="res://Assets/Images/Sprites/Kenney/Ships/enemyRed3.png" id="1_54q7k"]
+[ext_resource type="Script" path="res://Scripts/Actors/Enemy/EnemyController.gd" id="1_ljio6"]
+[ext_resource type="Script" path="res://Scripts/Actors/Enemy/AI/AIStateMachine.gd" id="2_i8jyv"]
+[ext_resource type="Script" path="res://Scripts/Actors/Health/Health.gd" id="3_nvduh"]
+[ext_resource type="Script" path="res://Scripts/Actors/Weapons/GunController.gd" id="4_4hndy"]
+[ext_resource type="PackedScene" uid="uid://25c824gbf34e" path="res://Scenes/Actors/Projectiles/Projectile.tscn" id="5_u1c5n"]
+[ext_resource type="Script" path="res://Scripts/Actors/Enemy/TargetChecker.gd" id="7_noqd3"]
+[ext_resource type="Script" path="res://Scripts/Helper/Spawner.gd" id="9_f3p10"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Hurtbox.gd" id="9_hr5xe"]
+[ext_resource type="PackedScene" uid="uid://dte3xnton4kjc" path="res://Scenes/Gameplay/Explosion.tscn" id="10_1e1ui"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/TakeDamage.gd" id="10_86px7"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/CheckForTarget.gd" id="11_blpla"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/CheckForScore.gd" id="11_xu27v"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/Knockback.gd" id="12_gu3gl"]
+[ext_resource type="Script" path="res://Scripts/Helper/DestroyOffScreen.gd" id="15_i3ihu"]
+[ext_resource type="Script" path="res://Scripts/Helper/CircleSpawner.gd" id="16_6tluf"]
+[ext_resource type="PackedScene" uid="uid://6j2rhh21qcer" path="res://Scenes/Gameplay/Environment/Wrackages/SpaceshipWrackage.tscn" id="17_xsc82"]
+[ext_resource type="Script" path="res://Scripts/Resources/SpawningItem.gd" id="18_jg5vl"]
+[ext_resource type="PackedScene" uid="uid://bo4vhd64a4xvk" path="res://Scenes/Gameplay/Environment/ItemPickUp.tscn" id="19_onwmd"]
+[ext_resource type="Script" path="res://Scripts/UI/UIHealthBar.gd" id="21_luns0"]
+[ext_resource type="Script" path="res://Scripts/Helper/CancelRotation.gd" id="21_r6rqq"]
+[ext_resource type="Script" path="res://Scripts/Actors/Enemy/SoftCollision.gd" id="23_5cpsr"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_yv3dn"]
+radius = 40.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_km847"]
+radius = 300.0
+
+[sub_resource type="Resource" id="Resource_dpmyr"]
+script = ExtResource("18_jg5vl")
+item = ExtResource("17_xsc82")
+_propability = 0.8
+
+[sub_resource type="Resource" id="Resource_7h30u"]
+script = ExtResource("18_jg5vl")
+item = ExtResource("19_onwmd")
+_propability = 0.2
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_erg5b"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_1cxf4"]
+resource_local_to_scene = true
+bg_color = Color(1, 0, 1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[sub_resource type="Gradient" id="Gradient_gbadt"]
+interpolation_mode = 1
+offsets = PackedFloat32Array(0, 0.33, 0.66)
+colors = PackedColorArray(1, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_aanup"]
+radius = 200.0
+
+[node name="Enemy" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 3
+script = ExtResource("1_ljio6")
+_max_speed = 200.0
+_acceleration = 200.0
+_friction = 300.0
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("2_i8jyv")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("3_nvduh")
+_starting_health = 50
+_max_health = 50
+_make_invincible = true
+
+[node name="InvincibilityTimer" type="Timer" parent="Health"]
+one_shot = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+rotation = -1.5708
+texture = ExtResource("1_54q7k")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("CircleShape2D_yv3dn")
+
+[node name="Guns" type="Node2D" parent="."]
+script = ExtResource("4_4hndy")
+_projectile = ExtResource("5_u1c5n")
+_setup_origin = false
+
+[node name="SpawnPoints" type="Node2D" parent="Guns"]
+
+[node name="SpawnPoint1" type="Marker2D" parent="Guns/SpawnPoints"]
+position = Vector2(48, -32)
+
+[node name="SpawnPoint2" type="Marker2D" parent="Guns/SpawnPoints"]
+position = Vector2(48, 32)
+
+[node name="CooldownTimer" type="Timer" parent="Guns"]
+one_shot = true
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 0
+script = ExtResource("9_hr5xe")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+visible = false
+shape = SubResource("CircleShape2D_yv3dn")
+
+[node name="Reactions" type="Node2D" parent="Hurtbox"]
+
+[node name="TakeDamage" type="Node" parent="Hurtbox/Reactions"]
+script = ExtResource("10_86px7")
+_health_ = NodePath("../../../Health")
+
+[node name="CheckForScore" type="Node" parent="Hurtbox/Reactions"]
+script = ExtResource("11_xu27v")
+_score_to_add = 500
+_health_ = NodePath("../../../Health")
+
+[node name="CheckFotTarget" type="Node" parent="Hurtbox/Reactions"]
+script = ExtResource("11_blpla")
+
+[node name="Knockback" type="Node" parent="Hurtbox/Reactions"]
+script = ExtResource("12_gu3gl")
+
+[node name="TargetChecker" type="Area2D" parent="."]
+collision_layer = 0
+script = ExtResource("7_noqd3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TargetChecker"]
+visible = false
+shape = SubResource("CircleShape2D_km847")
+
+[node name="RayCast2D" type="RayCast2D" parent="TargetChecker"]
+
+[node name="Timer" type="Timer" parent="TargetChecker"]
+wait_time = 0.1
+
+[node name="ExplosionSpawner" type="Node2D" parent="."]
+script = ExtResource("9_f3p10")
+_object_to_spawn = ExtResource("10_1e1ui")
+
+[node name="WrackageSpawner" type="Node2D" parent="."]
+script = ExtResource("16_6tluf")
+_max_distance = 50.0
+_max_amount = 5
+_items_to_spawn = Array[ExtResource("18_jg5vl")]([SubResource("Resource_dpmyr"), SubResource("Resource_7h30u")])
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+visible = false
+rect = Rect2(-64, -64, 128, 128)
+script = ExtResource("15_i3ihu")
+
+[node name="Timer" type="Timer" parent="VisibleOnScreenNotifier2D"]
+wait_time = 3.0
+one_shot = true
+
+[node name="HealthBarPivot" type="Node2D" parent="."]
+script = ExtResource("21_r6rqq")
+
+[node name="HealthBar" type="ProgressBar" parent="HealthBarPivot"]
+visible = false
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -64.0
+offset_top = -64.0
+offset_right = 64.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+theme_override_styles/background = SubResource("StyleBoxEmpty_erg5b")
+theme_override_styles/fill = SubResource("StyleBoxFlat_1cxf4")
+step = 1.0
+value = 100.0
+rounded = true
+show_percentage = false
+script = ExtResource("21_luns0")
+_color_gradient = SubResource("Gradient_gbadt")
+
+[node name="SoftCollision" type="Area2D" parent="." node_paths=PackedStringArray("_exclude")]
+visible = false
+collision_layer = 0
+collision_mask = 7
+script = ExtResource("23_5cpsr")
+_exclude = [NodePath(".."), NodePath("../Hurtbox")]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SoftCollision"]
+shape = SubResource("CircleShape2D_aanup")
+
+[connection signal="death" from="Health" to="." method="queue_free"]
+[connection signal="death" from="Health" to="ExplosionSpawner" method="spawn"]
+[connection signal="death" from="Health" to="WrackageSpawner" method="spawn"]
+[connection signal="health_changed" from="Health" to="HealthBarPivot/HealthBar" method="_on_health_changed"]
+[connection signal="health_setup" from="Health" to="HealthBarPivot/HealthBar" method="_on_health_health_setup"]
+[connection signal="timeout" from="Health/InvincibilityTimer" to="Health" method="_on_invincibility_timer_timeout"]
+[connection signal="timeout" from="Guns/CooldownTimer" to="Guns" method="_on_cooldown_timer_timeout"]
+[connection signal="target_spotted" from="Hurtbox/Reactions/CheckFotTarget" to="." method="_on_target_spotted"]
+[connection signal="body_entered" from="TargetChecker" to="TargetChecker" method="_on_body_entered"]
+[connection signal="body_exited" from="TargetChecker" to="TargetChecker" method="_on_body_exited"]
+[connection signal="target_spotted" from="TargetChecker" to="." method="_on_target_spotted"]
+[connection signal="timeout" from="TargetChecker/Timer" to="TargetChecker" method="_on_timer_timeout"]
+[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_exited"]
+[connection signal="timeout" from="VisibleOnScreenNotifier2D/Timer" to="VisibleOnScreenNotifier2D" method="_on_timer_timeout"]
+[connection signal="area_entered" from="SoftCollision" to="SoftCollision" method="_on_area_entered"]
+[connection signal="area_exited" from="SoftCollision" to="SoftCollision" method="_on_area_exited"]
+[connection signal="body_entered" from="SoftCollision" to="SoftCollision" method="_on_body_entered"]
+[connection signal="body_exited" from="SoftCollision" to="SoftCollision" method="_on_body_exited"]

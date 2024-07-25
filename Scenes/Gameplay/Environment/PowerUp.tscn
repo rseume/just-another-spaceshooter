@@ -1,0 +1,42 @@
+[gd_scene load_steps=7 format=3 uid="uid://bvt2lflb7yvcn"]
+
+[ext_resource type="Script" path="res://Scripts/Gameplay/Environment/ItemPickUp.gd" id="1_gn4tq"]
+[ext_resource type="Script" path="res://Scripts/Gameplay/Items/CollectedReactions/DestroySelf.gd" id="2_5udr4"]
+[ext_resource type="Script" path="res://Scripts/Gameplay/Items/CollectedReactions/Heal.gd" id="2_p864c"]
+[ext_resource type="Resource" path="res://Resources/InventoryItems/Healing.tres" id="2_pbu70"]
+[ext_resource type="Texture2D" uid="uid://d2cdrkvfr76j3" path="res://Assets/Images/Sprites/Kenney/Power-ups/bolt_gold.png" id="5_dwg8d"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_pp38i"]
+radius = 30.0
+
+[node name="PowerUp" type="Node2D"]
+script = ExtResource("1_gn4tq")
+_items = Array[Resource("res://Scripts/DataContainer/InventoryItem.gd")]([ExtResource("2_pbu70")])
+
+[node name="Reactions" type="Node" parent="."]
+
+[node name="Heal" type="Node" parent="Reactions"]
+script = ExtResource("2_p864c")
+
+[node name="DestroySelf" type="Node" parent="Reactions"]
+script = ExtResource("2_5udr4")
+
+[node name="DestroyTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
+autostart = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+scale = Vector2(2, 2)
+texture = ExtResource("5_dwg8d")
+
+[node name="Trigger" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Trigger"]
+visible = false
+shape = SubResource("CircleShape2D_pp38i")
+
+[connection signal="timeout" from="DestroyTimer" to="." method="queue_free"]
+[connection signal="body_entered" from="Trigger" to="." method="_on_trigger_body_entered"]

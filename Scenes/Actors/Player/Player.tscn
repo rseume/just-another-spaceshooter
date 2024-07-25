@@ -1,0 +1,99 @@
+[gd_scene load_steps=16 format=3 uid="uid://c86eof3pkwdq5"]
+
+[ext_resource type="Script" path="res://Scripts/Actors/Player/PlayerController.gd" id="1_fk8re"]
+[ext_resource type="Resource" uid="uid://dsh5kx5navhds" path="res://Resources/ScoreCounter/PlayerScoreCounter.tres" id="2_clntc"]
+[ext_resource type="Texture2D" uid="uid://clr28mi5sfhdb" path="res://Assets/Images/Sprites/Kenney/Ships/spaceShips_009.png" id="2_p4dup"]
+[ext_resource type="Script" path="res://Scripts/Actors/Player/PlayerInputHandler.gd" id="2_vyyim"]
+[ext_resource type="Resource" uid="uid://dwnqgqgcuxkkx" path="res://Resources/Inventory/PlayerInventory.tres" id="3_qj17n"]
+[ext_resource type="Script" path="res://Scripts/Actors/Weapons/GunController.gd" id="4_3njrb"]
+[ext_resource type="Script" path="res://Scripts/Actors/Player/PlayerDeathNotifier.gd" id="5_gqk21"]
+[ext_resource type="PackedScene" uid="uid://25c824gbf34e" path="res://Scenes/Actors/Projectiles/Projectile.tscn" id="5_qch03"]
+[ext_resource type="Script" path="res://Scripts/Actors/Health/Health.gd" id="6_q7tpo"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Hurtbox.gd" id="8_2m7d0"]
+[ext_resource type="Script" path="res://Scripts/Helper/Spawner.gd" id="10_aipeh"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/TakeDamage.gd" id="10_iv38x"]
+[ext_resource type="PackedScene" uid="uid://dte3xnton4kjc" path="res://Scenes/Gameplay/Explosion.tscn" id="11_h0lqn"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0m0xk"]
+radius = 20.0
+height = 70.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_ws0en"]
+radius = 25.0
+height = 75.0
+
+[node name="Player" type="CharacterBody2D"]
+collision_mask = 19
+script = ExtResource("1_fk8re")
+_max_speed = 300.0
+_slide_speed = 50.0
+_acceleration = 400.0
+_friction = 100.0
+_turn_speed = 5.0
+_score_counter = ExtResource("2_clntc")
+_inventory = ExtResource("3_qj17n")
+
+[node name="InputHandler" type="Node" parent="."]
+script = ExtResource("2_vyyim")
+
+[node name="DeathNotifier" type="Node" parent="."]
+script = ExtResource("5_gqk21")
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("6_q7tpo")
+_starting_health = 100
+_max_health = 100
+_make_invincible = true
+
+[node name="InvincibilityTimer" type="Timer" parent="Health"]
+one_shot = true
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+rotation = -1.5708
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("2_p4dup")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+visible = false
+shape = SubResource("CapsuleShape2D_0m0xk")
+
+[node name="Guns" type="Node2D" parent="."]
+script = ExtResource("4_3njrb")
+_projectile = ExtResource("5_qch03")
+
+[node name="SpawnPoints" type="Node2D" parent="Guns"]
+
+[node name="SpawnPoint1" type="Marker2D" parent="Guns/SpawnPoints"]
+position = Vector2(40, -28)
+
+[node name="SpawnPoint2" type="Marker2D" parent="Guns/SpawnPoints"]
+position = Vector2(40, 28)
+
+[node name="CooldownTimer" type="Timer" parent="Guns"]
+one_shot = true
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_mask = 0
+script = ExtResource("8_2m7d0")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+visible = false
+shape = SubResource("CapsuleShape2D_ws0en")
+
+[node name="Reactions" type="Node2D" parent="Hurtbox"]
+
+[node name="TakeDamage" type="Node" parent="Hurtbox/Reactions"]
+script = ExtResource("10_iv38x")
+_health_ = NodePath("../../../Health")
+
+[node name="ExplosionSpawner" type="Node2D" parent="."]
+script = ExtResource("10_aipeh")
+_object_to_spawn = ExtResource("11_h0lqn")
+
+[connection signal="kill_self" from="InputHandler" to="Health" method="kill"]
+[connection signal="death" from="Health" to="." method="queue_free"]
+[connection signal="death" from="Health" to="DeathNotifier" method="notify"]
+[connection signal="death" from="Health" to="ExplosionSpawner" method="spawn"]
+[connection signal="timeout" from="Health/InvincibilityTimer" to="Health" method="_on_invincibility_timer_timeout"]
+[connection signal="timeout" from="Guns/CooldownTimer" to="Guns" method="_on_cooldown_timer_timeout"]

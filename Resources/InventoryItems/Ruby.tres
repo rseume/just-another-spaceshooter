@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InventoryItem" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/DataContainer/InventoryItem.gd" id="1_mcva8"]
+[ext_resource type="Texture2D" uid="uid://bwq0blwh2hy0k" path="res://Assets/Images/UI/Icons/crystal (1).png" id="1_v7yvi"]
+
+[resource]
+script = ExtResource("1_mcva8")
+icon = ExtResource("1_v7yvi")
+_propability = 0.2

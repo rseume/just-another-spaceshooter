@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://bt27cr4uq00u6"]
+
+[ext_resource type="PackedScene" uid="uid://25c824gbf34e" path="res://Scenes/Actors/Projectiles/Projectile.tscn" id="1_51xor"]
+[ext_resource type="Script" path="res://Scripts/Actors/Movement/SeekingMovement.gd" id="2_erfbf"]
+[ext_resource type="Texture2D" uid="uid://v7kka8udvwy5" path="res://Assets/Images/Sprites/Kenney/Missiles/spaceMissiles_021.png" id="2_y78xx"]
+[ext_resource type="Script" path="res://Scripts/Helper/RotateTowardsDirection.gd" id="4_s8wgv"]
+
+[node name="Projectile" instance=ExtResource("1_51xor")]
+
+[node name="Movement" parent="." index="0"]
+script = ExtResource("2_erfbf")
+_max_speed = 1000.0
+_starting_speed = 500.0
+_acceleration = 1000.0
+_future_vision = 1.0
+
+[node name="SpritePivot" type="Node2D" parent="." index="2"]
+script = ExtResource("4_s8wgv")
+
+[node name="Sprite2D" type="Sprite2D" parent="SpritePivot" index="0"]
+texture_filter = 1
+rotation = 1.5708
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("2_y78xx")
+
+[node name="Sprite2D" parent="." index="3"]
+visible = false
+texture = ExtResource("2_y78xx")
+
+[connection signal="direction_changed" from="Movement" to="SpritePivot" method="rotate_towards_direction"]

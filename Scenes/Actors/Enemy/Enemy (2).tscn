@@ -1,0 +1,25 @@
+[gd_scene load_steps=5 format=3 uid="uid://da3885mfgh4lf"]
+
+[ext_resource type="PackedScene" uid="uid://1ccei5u8k8qe" path="res://Scenes/Actors/Enemy/Enemy.tscn" id="1_0s4ej"]
+[ext_resource type="Texture2D" uid="uid://bgqp0v0idjw2y" path="res://Assets/Images/Sprites/Kenney/Ships/enemyRed4.png" id="2_n5vbj"]
+[ext_resource type="PackedScene" uid="uid://bt27cr4uq00u6" path="res://Scenes/Actors/Projectiles/HomingMissle.tscn" id="3_lhtdx"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_p2tjy"]
+resource_local_to_scene = true
+bg_color = Color(1, 0, 1, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="Enemy" instance=ExtResource("1_0s4ej")]
+_max_speed = 400.0
+
+[node name="Sprite2D" parent="." index="2"]
+texture = ExtResource("2_n5vbj")
+
+[node name="Guns" parent="." index="4"]
+_projectile = ExtResource("3_lhtdx")
+
+[node name="HealthBar" parent="HealthBarPivot" index="0"]
+theme_override_styles/fill = SubResource("StyleBoxFlat_p2tjy")

@@ -1,0 +1,30 @@
+[gd_scene load_steps=13 format=3 uid="uid://6j2rhh21qcer"]
+
+[ext_resource type="PackedScene" uid="uid://ce4vs6d7mo1b4" path="res://Scenes/Gameplay/Environment/Wrackage.tscn" id="1_fjvln"]
+[ext_resource type="Script" path="res://Scripts/Helper/PickRandomSprite.gd" id="2_anfbm"]
+[ext_resource type="Texture2D" uid="uid://bgr718ws0i1ss" path="res://Assets/Images/Sprites/Kenney/Parts/wingRed_7.png" id="2_w5gx3"]
+[ext_resource type="Texture2D" uid="uid://87mifocw61yo" path="res://Assets/Images/Sprites/Kenney/Parts/wingRed_0.png" id="4_w5q6f"]
+[ext_resource type="Texture2D" uid="uid://cypqob5btnc7u" path="res://Assets/Images/Sprites/Kenney/Parts/wingRed_1.png" id="5_oa2pu"]
+[ext_resource type="Texture2D" uid="uid://d0x7abtq18o50" path="res://Assets/Images/Sprites/Kenney/Parts/wingRed_2.png" id="6_b117r"]
+[ext_resource type="Texture2D" uid="uid://bnbjuttgh3xjj" path="res://Assets/Images/Sprites/Kenney/Parts/wingRed_3.png" id="7_vlmah"]
+[ext_resource type="Texture2D" uid="uid://d34a6dnj31jb8" path="res://Assets/Images/Sprites/Kenney/Parts/wingRed_4.png" id="8_3md2o"]
+[ext_resource type="Texture2D" uid="uid://7yh6n6ktf40w" path="res://Assets/Images/Sprites/Kenney/Parts/wingRed_5.png" id="9_a8wjw"]
+[ext_resource type="Texture2D" uid="uid://dup4spcpigswr" path="res://Assets/Images/Sprites/Kenney/Parts/wingRed_6.png" id="10_xbjr7"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_36mpg"]
+radius = 24.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_7gdmb"]
+
+[node name="Wrackage" instance=ExtResource("1_fjvln")]
+
+[node name="Sprite2D" parent="." index="2"]
+texture = ExtResource("2_w5gx3")
+script = ExtResource("2_anfbm")
+_sprites = Array[Texture2D]([ExtResource("4_w5q6f"), ExtResource("5_oa2pu"), ExtResource("6_b117r"), ExtResource("7_vlmah"), ExtResource("8_3md2o"), ExtResource("9_a8wjw"), ExtResource("10_xbjr7"), ExtResource("2_w5gx3")])
+
+[node name="CollisionShape2D" parent="Hurtbox" index="0"]
+shape = SubResource("CircleShape2D_36mpg")
+
+[node name="CollisionShape2D" parent="Hitbox" index="0"]
+shape = SubResource("CircleShape2D_7gdmb")

@@ -1,0 +1,59 @@
+[gd_scene load_steps=13 format=3 uid="uid://bo4vhd64a4xvk"]
+
+[ext_resource type="Script" path="res://Scripts/Gameplay/Environment/ItemPickUp.gd" id="1_osor6"]
+[ext_resource type="Texture2D" uid="uid://bkgblw1cakung" path="res://Assets/Images/UI/Icons/crystal.png" id="1_sh7a0"]
+[ext_resource type="Resource" path="res://Resources/InventoryItems/Emerald.tres" id="2_6gloo"]
+[ext_resource type="Script" path="res://Scripts/Actors/Movement/LinearMovement.gd" id="2_jdphk"]
+[ext_resource type="Resource" path="res://Resources/InventoryItems/Diamond.tres" id="3_gtp4h"]
+[ext_resource type="Resource" path="res://Resources/InventoryItems/Amethyst.tres" id="4_33rct"]
+[ext_resource type="Script" path="res://Scripts/Gameplay/Items/CollectedReactions/CollectItem.gd" id="5_3gbfs"]
+[ext_resource type="Resource" path="res://Resources/InventoryItems/Sapphire.tres" id="5_d5jhs"]
+[ext_resource type="Resource" path="res://Resources/InventoryItems/Ruby.tres" id="6_gn6lh"]
+[ext_resource type="Script" path="res://Scripts/Helper/DestroyOffScreen.gd" id="6_jngh0"]
+[ext_resource type="Script" path="res://Scripts/Gameplay/Items/CollectedReactions/DestroySelf.gd" id="6_s11ye"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_tyw40"]
+radius = 15.0
+
+[node name="ItemPickUp" type="Node2D"]
+script = ExtResource("1_osor6")
+_items = Array[Resource("res://Scripts/DataContainer/InventoryItem.gd")]([ExtResource("6_gn6lh"), ExtResource("5_d5jhs"), ExtResource("2_6gloo"), ExtResource("4_33rct"), ExtResource("3_gtp4h")])
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_jdphk")
+_random_speed = true
+_min_speed = 50.0
+_max_speed = 100.0
+
+[node name="Reactions" type="Node" parent="."]
+
+[node name="CollectItem" type="Node" parent="Reactions"]
+script = ExtResource("5_3gbfs")
+
+[node name="DestroySelf" type="Node" parent="Reactions"]
+script = ExtResource("6_s11ye")
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("1_sh7a0")
+
+[node name="Trigger" type="Area2D" parent="."]
+collision_layer = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Trigger"]
+visible = false
+shape = SubResource("CircleShape2D_tyw40")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+visible = false
+rect = Rect2(-16, -16, 32, 32)
+script = ExtResource("6_jngh0")
+
+[node name="Timer" type="Timer" parent="VisibleOnScreenNotifier2D"]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="body_entered" from="Trigger" to="." method="_on_trigger_body_entered"]
+[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_exited"]
+[connection signal="timeout" from="VisibleOnScreenNotifier2D/Timer" to="VisibleOnScreenNotifier2D" method="_on_timer_timeout"]

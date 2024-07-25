@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="InventoryItem" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://Scripts/DataContainer/InventoryItem.gd" id="1_bopbs"]
+[ext_resource type="Texture2D" uid="uid://d2cdrkvfr76j3" path="res://Assets/Images/Sprites/Kenney/Power-ups/bolt_gold.png" id="1_p0jmg"]
+
+[resource]
+script = ExtResource("1_bopbs")
+icon = ExtResource("1_p0jmg")
+_propability = 0.5

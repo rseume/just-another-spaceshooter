@@ -1,0 +1,6 @@
+[gd_resource type="Resource" script_class="ScoreCounter" load_steps=2 format=3 uid="uid://dsh5kx5navhds"]
+
+[ext_resource type="Script" path="res://Scripts/Resources/ScoreCounter.gd" id="1_18tas"]
+
+[resource]
+script = ExtResource("1_18tas")

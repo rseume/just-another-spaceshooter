@@ -1,0 +1,58 @@
+[gd_scene load_steps=8 format=3 uid="uid://dte3xnton4kjc"]
+
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Hitbox.gd" id="1_5xy26"]
+[ext_resource type="Texture2D" uid="uid://5pb4krd8n7df" path="res://Assets/Images/Particle 1.png" id="1_7oti6"]
+[ext_resource type="Script" path="res://Scripts/Helper/PlayParticlesOnAwake.gd" id="4_04u5y"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_2t0av"]
+radius = 50.0
+
+[sub_resource type="Gradient" id="Gradient_hictv"]
+offsets = PackedFloat32Array(0, 0.5, 0.75, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_1niin"]
+gradient = SubResource("Gradient_hictv")
+width = 32
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_e0tsi"]
+particle_flag_disable_z = true
+spread = 180.0
+initial_velocity_min = 100.0
+initial_velocity_max = 100.0
+orbit_velocity_min = 0.0
+orbit_velocity_max = 0.0
+color_ramp = SubResource("GradientTexture1D_1niin")
+
+[node name="Explosion" type="Area2D"]
+collision_layer = 0
+collision_mask = 15
+monitoring = false
+monitorable = false
+script = ExtResource("1_5xy26")
+_damage = 50
+
+[node name="Reactions" type="Node" parent="."]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_2t0av")
+
+[node name="GPUParticles2D" type="GPUParticles2D" parent="."]
+emitting = false
+amount = 32
+process_material = SubResource("ParticleProcessMaterial_e0tsi")
+texture = ExtResource("1_7oti6")
+lifetime = 0.5
+one_shot = true
+explosiveness = 0.9
+visibility_rect = Rect2(-78.6653, -79.7729, 157.331, 157.277)
+draw_order = 0
+script = ExtResource("4_04u5y")
+
+[node name="DestroyTimer" type="Timer" parent="."]
+wait_time = 0.5
+one_shot = true
+autostart = true
+
+[connection signal="area_entered" from="." to="." method="_on_area_entered"]
+[connection signal="timeout" from="DestroyTimer" to="." method="queue_free"]

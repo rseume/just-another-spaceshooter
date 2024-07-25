@@ -1,0 +1,82 @@
+[gd_scene load_steps=12 format=3 uid="uid://25c824gbf34e"]
+
+[ext_resource type="Texture2D" uid="uid://r51jqb33p5c8" path="res://Assets/Images/Sprites/Kenney/Missiles/spaceMissiles_040.png" id="1_a2pyy"]
+[ext_resource type="Script" path="res://Scripts/Actors/Projectiles/Projectile.gd" id="1_vnoe2"]
+[ext_resource type="Script" path="res://Scripts/Actors/Movement/LinearMovement.gd" id="2_1vlt3"]
+[ext_resource type="Script" path="res://Scripts/Actors/Health/Health.gd" id="3_73wsj"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Hurtbox.gd" id="7_s8755"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/TakeDamage.gd" id="8_bm86j"]
+[ext_resource type="Script" path="res://Scripts/Helper/Spawner.gd" id="9_4d4up"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Hitbox.gd" id="9_l8qga"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/KillSelf.gd" id="10_7ln3j"]
+[ext_resource type="PackedScene" uid="uid://dte3xnton4kjc" path="res://Scenes/Gameplay/Explosion.tscn" id="10_n2kc4"]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_xjo0k"]
+radius = 4.0
+height = 26.0
+
+[node name="Projectile" type="Node2D"]
+script = ExtResource("1_vnoe2")
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_1vlt3")
+_speed = 1000.0
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("3_73wsj")
+_starting_health = 1
+_max_health = 1
+
+[node name="Sprite2D" type="Sprite2D" parent="."]
+texture_filter = 1
+rotation = 1.5708
+scale = Vector2(0.75, 0.75)
+texture = ExtResource("1_a2pyy")
+
+[node name="SpawnExplosion" type="Node2D" parent="."]
+script = ExtResource("9_4d4up")
+_object_to_spawn = ExtResource("10_n2kc4")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+script = ExtResource("7_s8755")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+visible = false
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_xjo0k")
+
+[node name="Reactions" type="Node2D" parent="Hurtbox"]
+
+[node name="TakeDamage" type="Node" parent="Hurtbox/Reactions"]
+script = ExtResource("8_bm86j")
+_health_ = NodePath("../../../Health")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 15
+script = ExtResource("9_l8qga")
+_damage = 10
+_exclude_ = Array[NodePath]([NodePath("../Hurtbox")])
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+visible = false
+rotation = 1.5708
+shape = SubResource("CapsuleShape2D_xjo0k")
+
+[node name="Reactions" type="Node" parent="Hitbox"]
+
+[node name="KillSelf" type="Node" parent="Hitbox/Reactions"]
+script = ExtResource("10_7ln3j")
+_health_ = NodePath("../../../Health")
+
+[node name="DestroyTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+autostart = true
+
+[connection signal="death" from="Health" to="." method="queue_free"]
+[connection signal="death" from="Health" to="SpawnExplosion" method="spawn"]
+[connection signal="area_entered" from="Hitbox" to="Hitbox" method="_on_area_entered"]
+[connection signal="timeout" from="DestroyTimer" to="." method="queue_free"]

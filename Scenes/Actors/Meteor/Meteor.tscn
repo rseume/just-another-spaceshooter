@@ -1,0 +1,119 @@
+[gd_scene load_steps=21 format=3 uid="uid://cl2onnblimkle"]
+
+[ext_resource type="Script" path="res://Scripts/Helper/Blank.gd" id="1_odbct"]
+[ext_resource type="Texture2D" uid="uid://c5r5680ywu0n2" path="res://Assets/Images/Sprites/Kenney/Meteors/meteorBrown_big3.png" id="1_xqwrp"]
+[ext_resource type="Script" path="res://Scripts/Actors/Movement/SinWaveMovement.gd" id="2_527np"]
+[ext_resource type="Script" path="res://Scripts/Helper/Rotator.gd" id="2_jbq1x"]
+[ext_resource type="Script" path="res://Scripts/Actors/Health/Health.gd" id="3_8rmbf"]
+[ext_resource type="Script" path="res://Scripts/Helper/Spawner.gd" id="5_c8i8m"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Hurtbox.gd" id="6_54rbw"]
+[ext_resource type="PackedScene" uid="uid://dte3xnton4kjc" path="res://Scenes/Gameplay/Explosion.tscn" id="6_tji2i"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/TakeDamage.gd" id="7_aanhi"]
+[ext_resource type="Script" path="res://Scripts/Helper/CircleSpawner.gd" id="7_eis2t"]
+[ext_resource type="Script" path="res://Scripts/Helper/DestroyOffScreen.gd" id="7_udlnn"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Hitbox.gd" id="8_71e7l"]
+[ext_resource type="PackedScene" uid="uid://ce4vs6d7mo1b4" path="res://Scenes/Gameplay/Environment/Wrackage.tscn" id="8_bctnn"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/CheckForScore.gd" id="8_ljusj"]
+[ext_resource type="Script" path="res://Scripts/Resources/SpawningItem.gd" id="9_awf73"]
+[ext_resource type="Script" path="res://Scripts/Actors/Impact/Reactions/KillSelf.gd" id="10_4d5k0"]
+[ext_resource type="PackedScene" uid="uid://bo4vhd64a4xvk" path="res://Scenes/Gameplay/Environment/ItemPickUp.tscn" id="14_wa64f"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_xcyj3"]
+radius = 42.0
+
+[sub_resource type="Resource" id="Resource_jpblg"]
+script = ExtResource("9_awf73")
+item = ExtResource("8_bctnn")
+_propability = 0.8
+
+[sub_resource type="Resource" id="Resource_7h30u"]
+script = ExtResource("9_awf73")
+item = ExtResource("14_wa64f")
+_propability = 0.2
+
+[node name="Meteor" type="Node2D"]
+script = ExtResource("1_odbct")
+
+[node name="Movement" type="Node" parent="."]
+script = ExtResource("2_527np")
+_speed = 100.0
+_frequency = 200.0
+_amplitude = 100.0
+
+[node name="Health" type="Node" parent="."]
+script = ExtResource("3_8rmbf")
+_starting_health = 20
+_max_health = 20
+
+[node name="Rotator" type="Node2D" parent="."]
+script = ExtResource("2_jbq1x")
+_random_angle = true
+_min_speed = -10.0
+_max_speed = 10.0
+
+[node name="Sprite2D" type="Sprite2D" parent="Rotator"]
+texture_filter = 1
+texture = ExtResource("1_xqwrp")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 0
+script = ExtResource("6_54rbw")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+visible = false
+shape = SubResource("CircleShape2D_xcyj3")
+
+[node name="Reactions" type="Node2D" parent="Hurtbox"]
+
+[node name="TakeDamage" type="Node" parent="Hurtbox/Reactions"]
+script = ExtResource("7_aanhi")
+_health_ = NodePath("../../../Health")
+
+[node name="CheckForScore" type="Node" parent="Hurtbox/Reactions"]
+script = ExtResource("8_ljusj")
+_health_ = NodePath("../../../Health")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 7
+script = ExtResource("8_71e7l")
+_damage = 50
+_exclude_ = Array[NodePath]([NodePath("../Hurtbox")])
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+visible = false
+shape = SubResource("CircleShape2D_xcyj3")
+
+[node name="Reactions" type="Node" parent="Hitbox"]
+
+[node name="KillSelf" type="Node" parent="Hitbox/Reactions"]
+script = ExtResource("10_4d5k0")
+_health_ = NodePath("../../../Health")
+
+[node name="WrackageSpawner" type="Node2D" parent="."]
+script = ExtResource("7_eis2t")
+_max_distance = 50.0
+_max_amount = 5
+_items_to_spawn = Array[ExtResource("9_awf73")]([SubResource("Resource_jpblg"), SubResource("Resource_7h30u")])
+
+[node name="ExplosionSpawner" type="Node2D" parent="."]
+script = ExtResource("5_c8i8m")
+_object_to_spawn = ExtResource("6_tji2i")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+visible = false
+rect = Rect2(-64, -64, 128, 128)
+script = ExtResource("7_udlnn")
+
+[node name="Timer" type="Timer" parent="VisibleOnScreenNotifier2D"]
+wait_time = 3.0
+one_shot = true
+
+[connection signal="death" from="Health" to="." method="queue_free"]
+[connection signal="death" from="Health" to="WrackageSpawner" method="spawn"]
+[connection signal="death" from="Health" to="ExplosionSpawner" method="spawn"]
+[connection signal="area_entered" from="Hitbox" to="Hitbox" method="_on_area_entered"]
+[connection signal="screen_entered" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="VisibleOnScreenNotifier2D" method="_on_screen_exited"]
+[connection signal="timeout" from="VisibleOnScreenNotifier2D/Timer" to="VisibleOnScreenNotifier2D" method="_on_timer_timeout"]
