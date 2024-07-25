@@ -13,7 +13,7 @@ SpaceShooter is a 2D arcade-style space shooter game developed using the Godot E
 
 ### Prerequisites
 
-- [Godot Engine](https://godotengine.org/download) (version 3.2 or higher)
+- [Godot Engine](https://godotengine.org/download) (version 4.2 or higher)
 
 ### Installation
 
